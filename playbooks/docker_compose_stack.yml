@@ -1,0 +1,9 @@
+---
+- name: Test
+  hosts: '{{target|default("all")}}'
+  vars_files:
+    - vars/docker_compose_stack.yml
+  tasks:
+    - name: Debug all vars in scope
+      ansible.builtin.debug:
+        var: test_var
