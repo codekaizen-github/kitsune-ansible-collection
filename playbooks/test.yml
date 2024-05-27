@@ -1,0 +1,7 @@
+---
+- name: Test
+  hosts: '{{target|default("all")}}'
+  tasks:
+      - name: Test
+        ansible.builtin.debug:
+            msg: "Hello World"

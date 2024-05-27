@@ -1,0 +1,8 @@
+{
+    "ansible.python.interpreterPath": "/usr/bin/python3",
+    "files.associations": {
+        "**/docker-compose.yml": "dockercompose",
+        "**/vars/**/*.yml": "yaml",
+        "**/playbooks/**/*.yml": "ansible",
+    }
+}
