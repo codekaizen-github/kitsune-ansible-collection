@@ -8,15 +8,16 @@ ENV LANG=C.UTF-8
 
 RUN apt-get update && apt-get install -y \
     software-properties-common \
-    git \
-    python3-pip
+    python3-pip \
+    curl
 
 RUN apt-add-repository -y ppa:ansible/ansible
 
 RUN apt-get update && apt-get install -y \
     ansible
 
-RUN pip install ansible-lint
+# https://tomgregory.com/aws/running-docker-in-docker-on-windows/
+RUN curl -sSL https://get.docker.com/ | sh
 
 # Copy the rest of the files
 COPY ./ /workspace

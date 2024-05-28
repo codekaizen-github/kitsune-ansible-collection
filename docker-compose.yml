@@ -1,3 +1,6 @@
 services:
-    ansible:
-        image: ghcr.io/codekaizen-github/kitsune-ansible-collection:latest
+  ansible:
+    image: ghcr.io/codekaizen-github/kitsune-ansible-collection:latest
+    init: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

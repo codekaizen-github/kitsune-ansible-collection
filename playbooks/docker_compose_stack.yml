@@ -4,6 +4,12 @@
   vars_files:
     - vars/docker_compose_stack.yml
   tasks:
-    - name: Debug all vars in scope
-      ansible.builtin.debug:
-        var: test_var
+    - name: Deploy Docker Compose stack
+      community.docker.docker_compose_v2:
+        definition:
+          "{{ lookup('ansible.builtin.template', docker_compose_stack_docker_compose_file_src_template_file) |
+          from_yaml }}"
+        project_name: "{{ docker_compose_stack_docker_compose_project_name }}"
+        state: present
+      tags:
+        - docker_compose_stack

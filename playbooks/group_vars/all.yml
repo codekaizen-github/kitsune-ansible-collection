@@ -1,2 +1,2 @@
-docker_compose_stack_docker_compose_file_src: docker_compose_stack/docker-compose.yml.j2
-docker_compose_stack_docker_compose_file_dest: /opt/docker_compose_stack/docker-compose.yml
+docker_compose_stack_docker_compose_file_src_template_file: docker_compose_stack/docker-compose.yml.j2
+docker_compose_stack_docker_compose_project_name: docker_compose_stack
