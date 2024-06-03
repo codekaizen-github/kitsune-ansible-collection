@@ -1,5 +1,5 @@
 ---
-# ansible-playbook -e portainer_domain=portainer.umerx.app -e portainer_admin_username=admin -e portainer_admin_password='adminpassword'  -e stack_name=test14 -e '{"stack_env": [{"name": "KEY_ONE", "value": "VALUE_ONE"}, {"name": "KEY_TWO", "value": "VALUE_TWO"}]}' -e stack_endpoint_id=6  playbooks/portainer_stack.yml  -vvv
+# ansible-playbook -e portainer_domain=portainer.umerx.app -e portainer_admin_username=admin -e portainer_admin_password='adminpassword'  -e stack_name=test14 -e '{"stack_env": [{"name": "KEY_ONE", "value": "VALUE_ONE"}, {"name": "KEY_TWO", "value": "VALUE_TWO"}]}' -e stack_endpoint_id=6  playbooks/portainer_stack_file.yml  -vvv
 - name: Deploy Docker Compose stack to Portainer
   hosts: '{{target|default("localhost")}}'
   tasks:
