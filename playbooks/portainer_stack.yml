@@ -1,7 +1,15 @@
 ---
+# ansible-playbook -e portainer_domain=portainer.umerx.app -e portainer_admin_username=admin -e portainer_admin_password='adminpassword'  -e stack_name=test14 -e '{"stack_env": [{"name": "KEY_ONE", "value": "VALUE_ONE"}, {"name": "KEY_TWO", "value": "VALUE_TWO"}]}' -e stack_endpoint_id=6  playbooks/portainer_stack.yml  -vvv
 - name: Deploy Docker Compose stack to Portainer
   hosts: '{{target|default("localhost")}}'
   tasks:
+    - name: Set stack_env default
+      ansible.builtin.set_fact:
+        # stack_env: '{{ [{"name": "KEY_ONE", "value": "VALUE_ONE"}, {"name": "KEY_TWO", "value": "VALUE_TWO"}] }}'
+        stack_env: "{{ stack_env | default([]) }}"
+    - name: Debug stack_env
+      ansible.builtin.debug:
+        var: stack_env
     - name: Assert required variables are defined
       ansible.builtin.assert:
         that:
@@ -11,10 +19,15 @@
           - docker_compose_stack_docker_compose_file_src_template_file is defined
           - stack_name is defined
           - stack_endpoint_id is defined
-          - stack_env is defined
-    - name: Set fact for templated docker-compose.yml file
+          # If stack_env is defined, must be list of dictionaries
+          - stack_env is defined and stack_env | type_debug == 'list'
+          - stack_env is defined and stack_env | selectattr('name', 'defined') | list | unique | length == stack_env | length
+          - stack_env is defined and stack_env | selectattr('value', 'defined') | list | unique | length == stack_env | length
+    - name: Template the docker-compose.yml file
       ansible.builtin.set_fact:
-        docker_compose_stack_docker_compose_file_definition: "{{ lookup('ansible.builtin.template', docker_compose_stack_docker_compose_file_src_template_file) }}"
+        docker_compose_stack_docker_compose_file_definition:
+          "{{ lookup('ansible.builtin.template',
+          docker_compose_stack_docker_compose_file_src_template_file) }}"
     - name: Define portainer credentials as dictionary
       ansible.builtin.set_fact:
         portainer_admin_credentials:
@@ -30,52 +43,6 @@
         validate_certs: false
         return_content: true
       register: portainer_jwt_token_response
-    # /stacks/create/standalone/file:
-    #     post:
-    #       consumes:
-    #       - multipart/form-data
-    #       description: |-
-    #         Deploy a new stack into a Docker environment specified via the environment identifier.
-    #         **Access policy**: authenticated
-    #       operationId: StackCreateDockerStandaloneFile
-    #       parameters:
-    #       - description: Name of the stack
-    #         in: formData
-    #         name: Name
-    #         required: true
-    #         type: string
-    #       - description: 'Environment variables passed during deployment, represented
-    #           as a JSON array [{''name'': ''name'', ''value'': ''value''}].'
-    #         in: formData
-    #         name: Env
-    #         type: string
-    #       - description: Stack file
-    #         in: formData
-    #         name: file
-    #         type: file
-    #       - description: Identifier of the environment that will be used to deploy the
-    #           stack
-    #         in: query
-    #         name: endpointId
-    #         required: true
-    #         type: integer
-    #       produces:
-    #       - application/json
-    #       responses:
-    #         "200":
-    #           description: OK
-    #           schema:
-    #             $ref: '#/definitions/portainer.Stack'
-    #         "400":
-    #           description: Invalid request
-    #         "500":
-    #           description: Server error
-    #       security:
-    #       - ApiKeyAuth: []
-    #       - jwt: []
-    #       summary: Deploy a new compose stack from a file
-    #       tags:
-    #       - stacks
     # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.20.2#/stacks/StackCreateDockerStandaloneFile
     - name: Create new stack
       ansible.builtin.uri:
@@ -84,7 +51,7 @@
         body_format: form-multipart
         body:
           Name: "{{ stack_name }}"
-          # Env: "{{ stack_env | to_json }}"
+          Env: "{{ stack_env | to_json }}"
           file:
             content: "{{ docker_compose_stack_docker_compose_file_definition }}"
             filename: docker-compose.yml
