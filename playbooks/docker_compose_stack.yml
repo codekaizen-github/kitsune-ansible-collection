@@ -1,8 +1,6 @@
 ---
-- name: Test
+- name: Deploy Docker Compose stack to Docker
   hosts: '{{target|default("all")}}'
-  vars_files:
-    - vars/docker_compose_stack.yml
   tasks:
     - name: Deploy Docker Compose stack
       community.docker.docker_compose_v2:

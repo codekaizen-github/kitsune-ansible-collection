@@ -1,0 +1,96 @@
+---
+- name: Deploy Docker Compose stack to Portainer
+  hosts: '{{target|default("localhost")}}'
+  tasks:
+    - name: Assert required variables are defined
+      ansible.builtin.assert:
+        that:
+          - portainer_domain is defined
+          - portainer_admin_username is defined
+          - portainer_admin_password is defined
+          - docker_compose_stack_docker_compose_file_src_template_file is defined
+          - stack_name is defined
+          - stack_endpoint_id is defined
+          - stack_env is defined
+    - name: Set fact for templated docker-compose.yml file
+      ansible.builtin.set_fact:
+        docker_compose_stack_docker_compose_file_definition: "{{ lookup('ansible.builtin.template', docker_compose_stack_docker_compose_file_src_template_file) }}"
+    - name: Define portainer credentials as dictionary
+      ansible.builtin.set_fact:
+        portainer_admin_credentials:
+          Username: "{{ portainer_admin_username }}"
+          Password: "{{ portainer_admin_password }}"
+    - name: Get the JWT token using URI
+      ansible.builtin.uri:
+        url: "https://{{ portainer_domain }}/api/auth"
+        method: POST
+        body_format: json
+        body: "{{ portainer_admin_credentials }}"
+        status_code: 200
+        validate_certs: false
+        return_content: true
+      register: portainer_jwt_token_response
+    # /stacks/create/standalone/file:
+    #     post:
+    #       consumes:
+    #       - multipart/form-data
+    #       description: |-
+    #         Deploy a new stack into a Docker environment specified via the environment identifier.
+    #         **Access policy**: authenticated
+    #       operationId: StackCreateDockerStandaloneFile
+    #       parameters:
+    #       - description: Name of the stack
+    #         in: formData
+    #         name: Name
+    #         required: true
+    #         type: string
+    #       - description: 'Environment variables passed during deployment, represented
+    #           as a JSON array [{''name'': ''name'', ''value'': ''value''}].'
+    #         in: formData
+    #         name: Env
+    #         type: string
+    #       - description: Stack file
+    #         in: formData
+    #         name: file
+    #         type: file
+    #       - description: Identifier of the environment that will be used to deploy the
+    #           stack
+    #         in: query
+    #         name: endpointId
+    #         required: true
+    #         type: integer
+    #       produces:
+    #       - application/json
+    #       responses:
+    #         "200":
+    #           description: OK
+    #           schema:
+    #             $ref: '#/definitions/portainer.Stack'
+    #         "400":
+    #           description: Invalid request
+    #         "500":
+    #           description: Server error
+    #       security:
+    #       - ApiKeyAuth: []
+    #       - jwt: []
+    #       summary: Deploy a new compose stack from a file
+    #       tags:
+    #       - stacks
+    # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.20.2#/stacks/StackCreateDockerStandaloneFile
+    - name: Create new stack
+      ansible.builtin.uri:
+        url: "https://{{ portainer_domain }}/api/stacks/create/standalone/file?endpointId={{ stack_endpoint_id }}"
+        method: POST
+        body_format: form-multipart
+        body:
+          Name: "{{ stack_name }}"
+          # Env: "{{ stack_env | to_json }}"
+          file:
+            content: "{{ docker_compose_stack_docker_compose_file_definition }}"
+            filename: docker-compose.yml
+        headers:
+          Authorization: "Bearer {{ portainer_jwt_token_response.json.jwt }}"
+        status_code: 200
+        validate_certs: false
+        return_content: true
+      register: portainer_stack_response
