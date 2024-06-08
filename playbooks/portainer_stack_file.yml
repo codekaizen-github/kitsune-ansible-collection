@@ -44,6 +44,7 @@
         return_content: true
       register: portainer_jwt_token_response
     # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.20.2#/stacks/StackCreateDockerStandaloneFile
+    # TODO: Convert this to use stack string instead of file upload: https://app.swaggerhub.com/apis/portainer/portainer-ce/2.19.5#/stacks/StackCreateDockerStandaloneString
     - name: Create new stack
       ansible.builtin.uri:
         url: "https://{{ portainer_domain }}/api/stacks/create/standalone/file?endpointId={{ stack_endpoint_id }}"
