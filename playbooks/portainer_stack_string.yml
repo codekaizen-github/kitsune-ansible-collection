@@ -1,6 +1,6 @@
 ---
 # ansible-playbook -e kitsune_portainer_domain=portainer.umerx.app -e kitsune_portainer_admin_username=admin -e kitsune_portainer_admin_password='adminpassword'  -e kitsune_stack_name=test14 -e '{"kitsune_stack_env": [{"name": "KEY_ONE", "value": "VALUE_ONE"}, {"name": "KEY_TWO", "value": "VALUE_TWO"}]}' -e kitsune_stack_endpoint_id=6  playbooks/portainer_stack_file.yml  -vvv
-- name: Deploy Docker Compose stack to Portainer using file
+- name: Deploy Docker Compose stack to Portainer using string
   hosts: '{{kitsune_target|default("localhost")}}'
   tasks:
     - name: Set kitsune_stack_env default
@@ -13,7 +13,7 @@
           - kitsune_portainer_domain is defined
           - kitsune_portainer_admin_username is defined
           - kitsune_portainer_admin_password is defined
-          - kitsune_docker_compose_stack_docker_compose_file_src_template_file is defined
+          - kitsune_docker_compose_stack_docker_compose_file_definition is defined
           - kitsune_stack_name is defined
           - kitsune_stack_endpoint_id is defined
           # If kitsune_stack_env is defined, must be list of dictionaries
@@ -40,18 +40,16 @@
         validate_certs: false
         return_content: true
       register: kitsune_portainer_jwt_token_response
-    # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.20.2#/stacks/StackCreateDockerStandaloneFile
-    - name: Create new stack
+    # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.19.5#/stacks/StackCreateDockerStandaloneString
+    - name: Create new stack using a string
       ansible.builtin.uri:
-        url: "https://{{ kitsune_portainer_domain }}/api/stacks/create/standalone/file?endpointId={{ kitsune_stack_endpoint_id }}"
+        url: "https://{{ kitsune_portainer_domain }}/api/stacks/create/standalone/string?endpointId={{ kitsune_stack_endpoint_id }}"
         method: POST
-        body_format: form-multipart
+        body_format: json
         body:
-          Name: "{{ kitsune_stack_name }}"
-          Env: "{{ kitsune_stack_env | to_json }}"
-          file:
-            content: "{{ kitsune_docker_compose_stack_docker_compose_file_definition }}"
-            filename: docker-compose.yml
+          name: "{{ kitsune_stack_name }}"
+          env: "{{ kitsune_stack_env | to_json }}"
+          stackFileContent: "{{ kitsune_docker_compose_stack_docker_compose_file_definition }}"
         headers:
           Authorization: "Bearer {{ kitsune_portainer_jwt_token_response.json.jwt }}"
         status_code: 200
