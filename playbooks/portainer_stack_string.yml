@@ -43,7 +43,7 @@
         body_format: json
         body:
           name: "{{ kitsune_stack_name }}"
-          env: "{{ kitsune_stack_env | to_json }}"
+          env: "{{ kitsune_stack_env }}"
           stackFileContent: "{{ kitsune_docker_compose_stack_docker_compose_file_definition }}"
         headers:
           Authorization: "Bearer {{ kitsune_portainer_jwt_token_response.json.jwt }}"
