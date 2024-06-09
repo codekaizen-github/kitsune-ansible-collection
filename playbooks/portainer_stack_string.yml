@@ -20,11 +20,6 @@
           - kitsune_stack_env is defined and kitsune_stack_env | type_debug == 'list'
           - kitsune_stack_env is defined and kitsune_stack_env | selectattr('name', 'defined') | list | unique | length == kitsune_stack_env | length
           - kitsune_stack_env is defined and kitsune_stack_env | selectattr('value', 'defined') | list | unique | length == kitsune_stack_env | length
-    - name: Template the docker-compose.yml file
-      ansible.builtin.set_fact:
-        kitsune_docker_compose_stack_docker_compose_file_definition:
-          "{{ lookup('ansible.builtin.template',
-          kitsune_docker_compose_stack_docker_compose_file_src_template_file) }}"
     - name: Define portainer credentials as dictionary
       ansible.builtin.set_fact:
         kitsune_portainer_admin_credentials:
