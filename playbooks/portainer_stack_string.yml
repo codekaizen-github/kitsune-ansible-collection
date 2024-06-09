@@ -34,6 +34,7 @@
         status_code: 200
         validate_certs: false
         return_content: true
+        timeout: "{{ kitsune_portainer_api_timeout }}"
       register: kitsune_portainer_jwt_token_response
     # https://app.swaggerhub.com/apis/portainer/portainer-ce/2.19.5#/stacks/StackCreateDockerStandaloneString
     - name: Create new stack using a string
@@ -50,4 +51,5 @@
         status_code: 200
         validate_certs: false
         return_content: true
+        timeout: "{{ kitsune_portainer_api_timeout }}"
       register: kitsune_portainer_stack_response
