@@ -1,5 +1,5 @@
 {
-  "name": "code-kaizen-kitsune-dev-container-codespaces",
+  "name": "code-kaizen-kitsune-dev-container-docker",
   "image": "ghcr.io/codekaizen-github/ansible-dev-tools-image:latest",
   "workspaceFolder": "/workdir/ansible_collections/code_kaizen/kitsune",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workdir/ansible_collections/code_kaizen/kitsune,type=bind,consistency=cached",

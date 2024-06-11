@@ -1,23 +1,25 @@
 {
-  "name": "code-kaizen-kitsune-dev-container-codespaces",
+  "name": "code-kaizen-kitsune-dev-container-podman",
   "image": "ghcr.io/codekaizen-github/ansible-dev-tools-image:latest",
   "workspaceFolder": "/workdir/ansible_collections/code_kaizen/kitsune",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workdir/ansible_collections/code_kaizen/kitsune,type=bind,consistency=cached",
   "containerUser": "podman",
   "runArgs": [
-    "--security-opt",
-    "seccomp=unconfined",
-    "--security-opt",
-    "label=disable",
     "--cap-add=SYS_ADMIN",
     "--cap-add=SYS_RESOURCE",
     "--device",
     "/dev/fuse",
     "--security-opt",
+    "seccomp=unconfined",
+    "--security-opt",
+    "label=disable",
+    "--security-opt",
     "apparmor=unconfined",
-    "--hostname=ansible-dev-container"
+    "--userns=host",
+    "--hostname=ansible-dev-container",
+    "--volume",
+    "ansible-dev-tools-container-storage:/var/lib/containers"
   ],
-  "updateRemoteUserUID": true,
   "postAttachCommand": "pre-commit install;",
   "customizations": {
     "vscode": {
