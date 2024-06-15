@@ -1,7 +1,7 @@
 galaxy_info:
-  author: foo
-  description: Code_Kaizen.Kitsune Run Role
-  company: Code_Kaizen
+  author: andrewjamesdawes@gmail.com
+  description: Code_Kaizen.Kitsune ssh_key_install_from_privatekey Role
+  company: Code Kaizen
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

@@ -1,0 +1,30 @@
+---
+# tasks file for run
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
+# Copy all files from kitsune_ssh_key_install_from_privatekey_privatekey_dest_list to kitsune_ssh_key_install_from_privatekey_privatekey_dest
+- name: If kitsune_ssh_key_install_from_privatekey_privatekey_dest is not set, set it to be installed in the the ansible_user and keep the same file name
+  ansible.builtin.set_fact:
+    _kitsune_ssh_key_install_from_privatekey_privatekey_dest: "{{ kitsune_ssh_key_install_from_privatekey_privatekey_dest | default(ansible_env.HOME + '/.ssh/' + (kitsune_ssh_key_install_from_privatekey_privatekey_src | basename)) }}"
+  tags:
+    - ssh_key
+- name: Copy single file from kitsune_ssh_key_install_from_privatekey_privatekey_src to _kitsune_ssh_key_install_from_privatekey_privatekey_dest
+  ansible.builtin.copy:
+    src: "{{ kitsune_ssh_key_install_from_privatekey_privatekey_src }}"
+    dest: "{{ _kitsune_ssh_key_install_from_privatekey_privatekey_dest }}"
+    mode: "{{ kitsune_ssh_key_install_from_privatekey_privatekey_mode | default('0600') }}"
+    owner: "{{ kitsune_ssh_key_install_from_privatekey_keypair_owner | default(ansible_user) }}"
+    group: "{{ kitsune_ssh_key_install_from_privatekey_keypair_group | default(ansible_user) }}"
+    remote_src: "{{ kitsune_ssh_key_install_from_privatekey_privatekey_remote_src | default(false) }}"
+  tags:
+    - ssh_key
+# https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html
+# Generate a public key from a private key
+- name: Generate a public key from a private key
+  community.crypto.openssh_keypair:
+    path: "{{ _kitsune_ssh_key_install_from_privatekey_privatekey_dest }}"
+    regenerate: "{{ kitsune_ssh_key_install_from_privatekey_regenerate | default('never') }}"
+    mode: "{{ kitsune_ssh_key_install_from_privatekey_keypair_mode | default(None) }}"
+    owner: "{{ kitsune_ssh_key_install_from_privatekey_keypair_owner | default(ansible_user) }}"
+    group: "{{ kitsune_ssh_key_install_from_privatekey_keypair_group | default(ansible_user) }}"
+  tags:
+    - ssh_key

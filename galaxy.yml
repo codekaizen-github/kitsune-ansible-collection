@@ -14,7 +14,9 @@ description: shapeshift your lampp stack
 license_file: LICENSE
 # TO-DO: update the tags based on your content type
 tags: ["linux", "tools", "lampp", "wordpress"]
-dependencies: {}
+dependencies: {
+  "community.crypto": "*",
+}
 
 repository: https://github.com/codekaizen-github/kitsune-ansible-collection
 documentation: https://github.com/codekaizen-github/kitsune-ansible-collection
